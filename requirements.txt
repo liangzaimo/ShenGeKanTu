@@ -1,0 +1,8 @@
+pyside6
+pillow
+pillow-heif
+rawpy
+numpy
+rapidocr_onnxruntime
+pymupdf
+easyofd
