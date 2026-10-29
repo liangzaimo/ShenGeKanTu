@@ -1923,6 +1923,29 @@ def tool_icon(name, color="#3a3f47"):
     return QIcon(pm)
 
 
+def rotate_icon(left, color="#1f2328", size=28):
+    """粗圆弧箭头：右转顺时针，左转为其镜像"""
+    pm = QPixmap(size * 3, size * 3)
+    pm.setDevicePixelRatio(3)
+    pm.fill(Qt.transparent)
+    p = QPainter(pm)
+    p.setRenderHint(QPainter.Antialiasing)
+    p.scale(size / 24.0, size / 24.0)
+    if left:
+        p.translate(24, 0)
+        p.scale(-1, 1)
+    c = QColor(color)
+    p.setPen(QPen(c, 2.8, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+    p.drawArc(QRectF(4.5, 4.5, 15, 15), 100 * 16, -290 * 16)
+    ang = math.radians(100)
+    ex, ey = 12 + 7.5 * math.cos(ang), 12 - 7.5 * math.sin(ang)
+    p.setPen(Qt.NoPen)
+    p.setBrush(c)
+    p.drawPolygon(QPolygonF([QPointF(ex + 5.2, ey), QPointF(ex - 0.8, ey - 4.6), QPointF(ex - 0.8, ey + 4.6)]))
+    p.end()
+    return QIcon(pm)
+
+
 def color_icon(color, size_idx):
     s = 24
     pm = QPixmap(s * 2, s * 2)
@@ -3887,8 +3910,9 @@ class MainWindow(QMainWindow):
         bar.btn("‹", "上一张", lambda: self.flip(-1))
         bar.btn("›", "下一张", lambda: self.flip(1))
         bar.sep()
-        bar.btn("↺", "左转", lambda: self.rotate(-90))
-        bar.btn("↻", "右转", lambda: self.rotate(90))
+        for left, tip, deg in ((True, "左转（Ctrl+L）", -90), (False, "右转（Ctrl+R）", 90)):
+            b = bar.btn("", tip, lambda d=deg: self.rotate(d), icon=rotate_icon(left))
+            b.setIconSize(QSize(28, 28))
         bar.btn("编辑", "在图片上标注、打马赛克、加水印、文字识别（E）", self.start_edit)
         bar.btn("翻译", "把图片里的外文直接翻译成中文（T）", self.start_translate)
         bar.btn("删除", "删除到回收站（Del）", self.delete_current)
